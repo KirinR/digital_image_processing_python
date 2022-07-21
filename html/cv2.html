@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>数字图像处理模板匹配</title>
+        <link rel="stylesheet" href="./bootstrap/css/bootstrap.css">
+        <script src="./bootstrap/js/bootstrap.js"></script>
+        <script src="https://unpkg.com/vue@next"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    </head>
+    <body>
+        <h1 align="center" style="margin-top: 20px">数字图像处理模板匹配</h1>
+        <HR>
+        <div id="app">
+        <div class="container" style="text-align: center;margin-bottom: 30px;">
+            <div class="row">
+                <div class="col">
+                    <h4>处理前</h4>
+                    <img :src="img1" width="200" height="200">
+                    <img :src="img2" width="200" height="200">
+                </div>
+                <div class="col" style="line-height: 480px">
+                    <select @change="change_sel" v-model="mode">
+                        <option value="模板匹配">模板匹配</option>  
+                    </select>
+                </div>
+                <div class="col">
+                    <h4>处理后</h4>
+                    <img :src="img_p()" width="450" height="450">
+                </div>
+            </div>
+        </div>
+        <div class="container" style="margin-top: 30px;">
+            <div class="row">
+                <input @change="upload1" id="file1" type="file" hidden>
+                <button @click="select1" class="btn btn-secondary col " style="margin-left: 10px;margin-right:10px">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-image" viewBox="0 0 16 16">
+                        <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                        <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+                    </svg>
+                    上传模板
+                </button>
+                <input @change="upload2" id="file2" type="file" hidden>
+                <button @click="select2" class="btn btn-secondary col " style="margin-left: 10px;margin-right:10px">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-image" viewBox="0 0 16 16">
+                        <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                        <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+                    </svg>
+                    上传目标图
+                </button>
+                <button @click="submit" class="btn btn-primary col" style="margin-left: 10px;margin-right:10px">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play" viewBox="0 0 16 16">
+                        <path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/>
+                    </svg>
+                    执行
+                </button>
+                <button @click="download" class="btn btn-success col" style="margin-left: 10px;margin-right:10px">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-arrow-down" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M7.646 10.854a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 9.293V5.5a.5.5 0 0 0-1 0v3.793L6.354 8.146a.5.5 0 1 0-.708.708l2 2z"/>
+                        <path d="M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383zm.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z"/>
+                    </svg>
+                    下载
+                </button>
+            </div>
+        </div>
+        </div>
+    </body>
+    <script>
+        const app=Vue.createApp({
+            data(){
+                return{
+                    img1:null,
+                    img2:null,
+                    mode:'模板匹配',
+                    transed:false,
+                }
+            },
+            methods:{
+                select1(){
+                    document.getElementById('file1').click()
+                },
+                select2(){
+                    document.getElementById('file2').click()
+                },
+                change_sel(){
+                    this.transed = false;
+                },
+                upload1(){
+                    this.transed=false
+                    let file=document.getElementById('file1').files[0]
+                    let reader=new FileReader()
+                    reader.onload=e=>{
+                        this.img1=e.target.result
+                    }
+                    reader.readAsDataURL(file)
+                },
+                upload2(){
+                    this.transed=false
+                    let file=document.getElementById('file2').files[0]
+                    let reader=new FileReader()
+                    reader.onload=e=>{
+                        this.img2=e.target.result
+                    }
+                    reader.readAsDataURL(file)
+                },
+                submit(){
+                    axios.post('http://127.0.0.1:5000/trans',{img1:this.img1,img2:this.img2}).then(res=>{
+                        if(res.data=='err')alert('转换出错');
+                        else this.transed=true
+                    }).catch(err=>alert('转换出错'))
+                },
+                download(){
+                    if(!this.transed)alert('请先转换图片')
+                    else {
+                        window.open(this.img_p())
+                    }
+                },
+                img_p(){
+                    if(this.transed)return `http://127.0.0.1:5000/static2/${this.mode}.jpg`
+                    else return null
+                }
+            }
+        })
+        app.mount('#app')
+    </script>
+</html>
