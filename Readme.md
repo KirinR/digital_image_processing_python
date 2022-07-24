@@ -1,7 +1,7 @@
 基于flask框架实现前后端交互
 html对应server
 html1对应server1
-html对应server2
+html2对应server2
 
 运行server文件后打开对应的html即可进入系统（一次只能运行一个server，所有server默认使用5000端口）
 
